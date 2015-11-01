@@ -4,20 +4,30 @@
 # ARP Spoof Basic script
 #
 require 'packetfu'
+require 'getopt/long'
 
 
-if ARGV.count < 1
-  puts "Usage: sudo -E block.rb <victim_ip>"
+options = Getopt::Long.getopts(
+  ['--help', '-h', Getopt::BOOLEAN],
+  ['--victim_ip', '-i', Getopt::REQUIRED],
+  ['--victim_mac', '-m', Getopt::OPTIONAL]
+)
+
+if ARGV.count < 1 or options['h'] or !options.include?('i')
+  puts "Usage: sudo -E block.rb -ip <victim_ip> <options>"
+  puts "options:"
+  puts " -h, --help \t\t Show this help"
+  puts " -i, --victim_ip \t Set victim ip, this flag is required"
+  puts " -m, --victim_mac \t Set victim mac_adress"
   abort
-elsif ARGV.count == 2
-  victim_mac = ARGV[1].to_s
 end
 
 info = PacketFu::Utils.whoami?(:iface => "wlan0")
 our_ip = info[:ip_saddr]
 our_mac = info[:eth_saddr]
 
-victim_ip = ARGV[0].to_s
+victim_ip = options['i']
+victim_mac = options['m']
 victim_mac ||= PacketFu::Utils.arp(victim_ip, :iface => "wlan0")
 
 n = our_ip.split('.')
