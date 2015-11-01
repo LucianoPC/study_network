@@ -14,7 +14,7 @@ options = Getopt::Long.getopts(
 )
 
 if ARGV.count < 1 or options['h'] or !options.include?('i')
-  puts "Usage: sudo -E block.rb -ip <victim_ip> <options>"
+  puts "Usage: sudo -E block.rb -i <victim_ip> <options>"
   puts "options:"
   puts " -h, --help \t\t Show this help"
   puts " -i, --victim_ip \t Set victim ip, this flag is required"
@@ -29,6 +29,13 @@ our_mac = info[:eth_saddr]
 victim_ip = options['i']
 victim_mac = options['m']
 victim_mac ||= PacketFu::Utils.arp(victim_ip, :iface => "wlan0")
+
+if victim_mac.nil?
+  puts "MAC ADDRESS of IP #{victim_ip} is not founded"
+  puts ""
+  puts "Usage: sudo -E block.rb -i <victim_ip> -m <victim_mac>"
+  abort
+end
 
 n = our_ip.split('.')
 router_ip = "#{n[0]}.#{n[1]}.#{n[2]}.1"
