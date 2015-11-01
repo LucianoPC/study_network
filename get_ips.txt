@@ -1,1 +1,0 @@
-sudo nmap -sU --script nbstat.nse -p137 172.16.5.1-254 > pcs.txt
